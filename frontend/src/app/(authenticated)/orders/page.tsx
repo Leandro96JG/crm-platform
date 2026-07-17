@@ -8,6 +8,7 @@ import OrdersTable from '@/app/components/orders/table';
 import Topbar from '@/app/components/common/topbar';
 import { fetchOrders } from '@/app/services/orders';
 import { getInitials } from '@/app/utils/user-display';
+import Link from 'next/link';
 
 type OrdersPageParams = {
   searchParams: Promise<{
@@ -54,6 +55,14 @@ export default async function OrdersPage({ searchParams }: OrdersPageParams) {
       />
       <div className="cut-divider" />
       <main className="animate-fadeIn px-8 pb-10">
+        <div className="mb-4 flex justify-end">
+          <Link
+            href="/orders/new"
+            className="rounded-lg bg-cut-dark px-4 py-2 text-sm font-semibold text-white transition-colors hover:opacity-90"
+          >
+            + Nuevo pedido
+          </Link>
+        </div>
         <OrdersTable orders={data.result} paging={data.paging} />
       </main>
     </>

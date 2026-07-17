@@ -56,6 +56,16 @@ Marca: **Viva**. Moneda: **peso argentino (ARS, locale es-AR)**.
 ### Moneda
 - `ARS` / `es-AR` en `utils/status.ts`. Eliminada toda referencia a Brasil/BRL.
 
+### Crear pedido desde la UI (P0)
+- **Formulario de alta de pedidos** en `/orders/new` (botón "+ Nuevo pedido" en `/orders`).
+- Servicio `createOrder` (`services/orders/create.ts`, `POST /orders`): llena `created_by`
+  con la sesión, revalida `/orders` y `/home`.
+- Servicios de planchas `fetchMaterials` (`GET /materials`) y `calculatePrice`
+  (`GET /planchas/:id/calculate-price`) en `services/planchas/` + tipo `CalculatePriceResult`.
+- Componente client `components/orders/order-form.tsx`: cliente (texto libre), urgencia,
+  notas, ítems dinámicos (plancha/material/cantidad) con **cálculo de precio en vivo** por
+  ítem y total en ARS; snackbar de éxito y redirect a `/orders`.
+
 ### Mutaciones de estado en la UI (P0 parcial)
 - **Cambiar estado de pedido**: servicio `updateOrderStatus` (`services/orders/update-status.ts`,
   `PUT /orders/:id/status`) + dropdown de acciones en `components/orders/status-actions.tsx`
@@ -104,7 +114,7 @@ Marca: **Viva**. Moneda: **peso argentino (ARS, locale es-AR)**.
 
 ### P0 — Crítico (hace el CRM realmente usable)
 - [ ] **Mutaciones de pedidos en la UI**
-  - [ ] Crear pedido (formulario: cliente, items con plancha+material+cantidad).
+  - [x] Crear pedido (formulario: cliente, items con plancha+material+cantidad). ✅
   - [x] Cambiar estado del pedido (dropdown de acciones con transiciones válidas). ✅
   - [ ] Página de detalle `/orders/[order_id]` con items y timeline de estado.
   - [x] Servicio frontend de mutación `updateOrderStatus` (`PUT /orders/:id/status`). ✅
@@ -155,10 +165,9 @@ Marca: **Viva**. Moneda: **peso argentino (ARS, locale es-AR)**.
 ---
 
 ## 🎯 Próximo paso sugerido
-El cambio de estado de pedidos y el avance de producción desde la UI ya están
+Crear pedido, cambiar estado de pedidos y avanzar producción desde la UI ya están
 hechos. Los siguientes pasos P0 de mayor valor:
-1. **Crear pedido desde la UI** (formulario con cliente + items) — cierra el ciclo
-   completo del flujo diario.
-2. **Página de detalle `/orders/[order_id]`** con items y timeline de estado.
-3. **Módulo de Clientes** (backend + FK `orders.customer_id` + UI) — hoy el cliente
+1. **Página de detalle `/orders/[order_id]`** con items y timeline de estado.
+2. **Módulo de Clientes** (backend + FK `orders.customer_id` + UI) — hoy el cliente
    es texto libre; es el mayor gap de datos.
+3. **Arreglar enlace roto** `/users/[user_id]` (detalle/edición o quitar el botón "ver").
