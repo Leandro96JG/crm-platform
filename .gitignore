@@ -1,0 +1,49 @@
+# ---- Dependencies ----
+node_modules/
+**/node_modules/
+.pnp
+.pnp.js
+.yarn/install-state.gz
+
+# ---- Env / secrets ----
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# ---- Next.js / frontend build ----
+.next/
+out/
+build/
+coverage/
+*.tsbuildinfo
+next-env.d.ts
+.vercel
+
+# ---- Go / backend build ----
+/backend/server
+/backend/server.exe
+*.exe
+*.test
+*.out
+
+# ---- Logs ----
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log
+
+# ---- Editor / OS ----
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# ---- opencode local ----
+.opencode/node_modules/
+.opencode/.gitignore
+
+# ---- Temp / scratch ----
+frontend_temp/
+.notes/

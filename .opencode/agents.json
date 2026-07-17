@@ -1,0 +1,16 @@
+{
+  "sales-agent": {
+    "description": "Agente de ventas híbrido que atiende clientes por WhatsApp. Recomienda productos, cotiza, cierra ventas simples y escala las complejas a humano.",
+    "type": "general",
+    "tools": ["read", "grep", "webSearch"],
+    "model": "openai-gpt4o-mini",
+    "instructions": "Agente de ventas para CRM de stickers. Consultar .opencode/skills/ai-sales.md para el comportamiento completo."
+  },
+  "production-agent": {
+    "description": "Agente que gestiona la cola de producción (impresión y corte). Monitorea trabajos pendientes, asigna prioridades y notifica cambios de estado.",
+    "type": "general",
+    "tools": ["read", "grep", "bash"],
+    "model": "openai-gpt4o-mini",
+    "instructions": "Agente de producción para taller de stickers. Consultar .opencode/skills/printing.md para el flujo de trabajo."
+  }
+}

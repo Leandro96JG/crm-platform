@@ -1,0 +1,56 @@
+'use server';
+import { getApiErrorMessage } from '@/app/libs/api-error';
+import { ServiceResponse } from '@/app/types/service';
+import { User } from '@/app/types/user';
+import { cookies } from 'next/headers';
+import { crmCoreApiKey, crmCoreEndpoint } from '.';
+
+export async function getUserByID(
+  userID: string
+): Promise<ServiceResponse<User>> {
+  try {
+    if (userID == '') {
+      return {
+        success: false,
+        message: 'ID del usuario no informado',
+      };
+    }
+
+    const jwt = (await cookies()).get('jwt')?.value;
+    const url = `${crmCoreEndpoint}/crm/core/api/v1/users/${userID}`;
+    const resp = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-API-Key': crmCoreApiKey || '',
+        Authorization: `Bearer ${jwt}`,
+      },
+    });
+
+    if (!resp.ok) {
+      const unauthorized = resp.status === 401;
+      const errorMessageDefault = unauthorized
+        ? 'usuario no autorizado'
+        : 'fallo en la búsqueda del usuario';
+      const errorMessage = await getApiErrorMessage(resp, errorMessageDefault);
+
+      return {
+        success: false,
+        message: errorMessage,
+        unauthorized: unauthorized,
+      };
+    }
+
+    const data = (await resp.json()) as User;
+    return {
+      success: true,
+      message: 'usuario encontrado con éxito',
+      data,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: 'algo salió mal, contacte al soporte!',
+    };
+  }
+}

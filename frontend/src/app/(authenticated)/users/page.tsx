@@ -1,0 +1,65 @@
+'use server';
+import UsersTable from '@/app/components/users/table';
+import Topbar from '@/app/components/common/topbar';
+import { fetchUsers } from '@/app/services/user';
+import { getCurrentUser } from '@/app/libs/session';
+import { UserListItem } from '@/app/types/user-list-item';
+import { adminRoles } from '@/app/utils/roles';
+import { getInitials } from '@/app/utils/user-display';
+import { redirect } from 'next/navigation';
+
+type UserPageParams = {
+  searchParams: Promise<{
+    query?: string;
+    page?: number;
+  }>;
+};
+
+export default async function Page({ searchParams }: UserPageParams) {
+  const { query, page } = await searchParams;
+  const session = await getCurrentUser();
+
+  if (!session) {
+    redirect('/login');
+  }
+
+  if (!adminRoles.includes(session.role)) {
+    redirect('/home');
+  }
+
+  const { data: usersData } = await fetchUsers(
+    (query || '') + '&role=operator&role=admin&role=admin_operator',
+    page || 1
+  );
+
+  const users = usersData
+    ? {
+        result: usersData.result.map(
+          (u): UserListItem => ({
+            user_id: u.user_id,
+            username: u.username,
+            first_name: u.first_name,
+            last_name: u.last_name,
+            email: u.email,
+            role: u.role,
+            active: u.active,
+          })
+        ),
+        paging: usersData.paging,
+      }
+    : undefined;
+
+  return (
+    <>
+      <Topbar
+        title="Usuarios"
+        subtitle="Gestión de operadores y administradores"
+        initials={getInitials(session.name ?? session.username)}
+      />
+      <div className="cut-divider" />
+      <main className="animate-fadeIn px-8 pb-10">
+        <UsersTable users={users} initialPage={page} />
+      </main>
+    </>
+  );
+}

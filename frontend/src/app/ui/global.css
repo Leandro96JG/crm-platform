@@ -1,0 +1,128 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* =========================================================
+   TOKENS DE TEMA — canales RGB para usar con Tailwind
+   Tema claro por defecto en :root; tema oscuro en .dark
+   ========================================================= */
+:root {
+  --paper: 250 249 245;
+  --paper-dim: 241 239 231;
+  --ink: 32 36 43;
+  --ink-soft: 91 100 114;
+  --ink-faint: 148 160 175;
+  --line: 228 224 214;
+  --card: 255 255 255;
+
+  --sidebar: 27 32 39;
+  --sidebar-soft: 42 49 59;
+  --sidebar-text: 199 205 214;
+
+  --cut: 255 90 54;
+  --cut-dark: 224 67 31;
+  --teal: 14 158 150;
+
+  --ok-bg: 229 245 234;
+  --ok-fg: 28 122 65;
+  --warn-bg: 255 243 220;
+  --warn-fg: 180 114 10;
+  --info-bg: 230 238 255;
+  --info-fg: 44 86 200;
+  --prod-bg: 228 246 244;
+  --prod-fg: 14 126 119;
+  --done-bg: 236 234 251;
+  --done-fg: 91 69 196;
+  --danger-bg: 251 231 229;
+  --danger-fg: 193 59 44;
+}
+
+.dark {
+  --paper: 17 20 25;
+  --paper-dim: 30 35 42;
+  --ink: 235 238 242;
+  --ink-soft: 160 169 181;
+  --ink-faint: 110 120 133;
+  --line: 45 52 62;
+  --card: 27 32 39;
+
+  --sidebar: 13 16 20;
+  --sidebar-soft: 33 39 48;
+  --sidebar-text: 190 197 207;
+
+  --cut: 255 106 74;
+  --cut-dark: 255 138 112;
+  --teal: 45 190 181;
+
+  --ok-bg: 22 51 36;
+  --ok-fg: 116 216 155;
+  --warn-bg: 58 44 18;
+  --warn-fg: 240 190 96;
+  --info-bg: 25 38 66;
+  --info-fg: 140 174 255;
+  --prod-bg: 18 47 45;
+  --prod-fg: 90 210 200;
+  --done-bg: 38 33 66;
+  --done-fg: 180 165 250;
+  --danger-bg: 58 26 24;
+  --danger-fg: 250 150 140;
+}
+
+body {
+  background: rgb(var(--paper));
+  color: rgb(var(--ink));
+}
+
+/* =========================================================
+   UTILIDADES DE MARCA — estética de taller de corte
+   ========================================================= */
+@layer components {
+  .cut-divider {
+    @apply relative mx-8 mb-6 border-t-2 border-dashed;
+    height: 0;
+    border-color: rgb(var(--line));
+  }
+  .cut-divider::before,
+  .cut-divider::after {
+    content: '+';
+    @apply absolute top-1/2 -translate-y-1/2 text-[11px];
+    color: rgb(var(--ink-faint));
+  }
+  .cut-divider::before {
+    left: -4px;
+  }
+  .cut-divider::after {
+    right: -4px;
+  }
+
+  /* marca de registro — guiño a las cruces de registro de impresión */
+  .register-mark::after {
+    content: '';
+    @apply absolute;
+    top: 14px;
+    right: 14px;
+    width: 11px;
+    height: 11px;
+    background:
+      linear-gradient(rgb(var(--line)), rgb(var(--line))) center/100% 1.4px
+        no-repeat,
+      linear-gradient(90deg, rgb(var(--line)), rgb(var(--line))) center/1.4px
+        100% no-repeat;
+    opacity: 0.9;
+  }
+}
+
+input[type='number'] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+input[type='number']::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type='number']::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}

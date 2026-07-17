@@ -1,0 +1,3 @@
+-- Irreversible: insurance tables were removed from the sticker CRM.
+-- No down migration is provided; restoring would require the original
+-- schema definitions from migrations 002-012.

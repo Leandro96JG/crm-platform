@@ -1,0 +1,60 @@
+'use server';
+import { getApiErrorMessage } from '@/app/libs/api-error';
+import { SearchResponse } from '@/app/types/search_response';
+import { ServiceResponse } from '@/app/types/service';
+import { User } from '@/app/types/user';
+import { cookies } from 'next/headers';
+import { crmCoreApiKey, crmCoreEndpoint } from '.';
+
+export async function fetchUsers(
+  query: string,
+  page: number,
+  limit: number = 10
+): Promise<ServiceResponse<SearchResponse<User>>> {
+  try {
+    page = page - 1;
+    const jwt = (await cookies()).get('jwt')?.value;
+    let url = `${crmCoreEndpoint}/crm/core/api/v1/users?offset=${page * limit}&limit=${limit}`;
+    if (query) {
+      url = `${url}&${query}`;
+    }
+
+    const resp = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-API-Key': crmCoreApiKey || '',
+        Authorization: `Bearer ${jwt}`,
+      },
+    });
+
+    if (!resp.ok) {
+      const unauthorized = resp.status === 401;
+      const errorMessageDefault = unauthorized
+        ? 'usuario no autorizado'
+        : 'fallo en la búsqueda de los usuarios';
+      const errorMessage = await getApiErrorMessage(resp, errorMessageDefault);
+
+      return {
+        success: false,
+        message: errorMessage,
+        unauthorized: unauthorized,
+      };
+    }
+
+    const respData = (await resp.json()) as SearchResponse<User>;
+
+    return {
+      message: 'usuarios encontrados con éxito',
+      success: true,
+      data: respData,
+    };
+  } catch (ex) {
+    console.error(ex);
+
+    return {
+      success: false,
+      message: 'algo salió mal, contacte al soporte!',
+    };
+  }
+}
