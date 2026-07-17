@@ -3,6 +3,7 @@ import Topbar from '@/app/components/common/topbar';
 import OrderForm from '@/app/components/orders/order-form';
 import { getCurrentUser } from '@/app/libs/session';
 import { fetchPlanchas, fetchMaterials } from '@/app/services/planchas';
+import { fetchCustomers } from '@/app/services/customers';
 import { getInitials } from '@/app/utils/user-display';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
@@ -13,13 +14,15 @@ export default async function NewOrderPage() {
     redirect('/login');
   }
 
-  const [planchasResp, materialsResp] = await Promise.all([
+  const [planchasResp, materialsResp, customersResp] = await Promise.all([
     fetchPlanchas('is_active=true', 1, 100),
     fetchMaterials(),
+    fetchCustomers('', 1, 100),
   ]);
 
   const planchas = planchasResp.data?.result ?? [];
   const materials = materialsResp.data?.result ?? [];
+  const customers = customersResp.data?.result ?? [];
 
   return (
     <>
@@ -45,7 +48,11 @@ export default async function NewOrderPage() {
               : 'No hay materiales cargados para crear un pedido.'}
           </div>
         ) : (
-          <OrderForm planchas={planchas} materials={materials} />
+          <OrderForm
+            planchas={planchas}
+            materials={materials}
+            customers={customers}
+          />
         )}
       </main>
     </>

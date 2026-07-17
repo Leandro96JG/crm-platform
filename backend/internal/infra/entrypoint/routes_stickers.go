@@ -13,6 +13,7 @@ func LoadStickerRoutes(
 	orderController rest.OrderController,
 	printingController rest.PrintingController,
 	whatsappController rest.WhatsAppController,
+	customerController rest.CustomerController,
 ) {
 	authGroup := app.Group("/crm/core/api/v1")
 	authGroup.Use(authMiddleware.Authenticate())
@@ -41,6 +42,13 @@ func LoadStickerRoutes(
 
 	// Plancha prices
 	authGroup.POST("/prices", planchaController.CreatePrice)
+
+	// Customers
+	authGroup.POST("/customers", customerController.CreateCustomer)
+	authGroup.GET("/customers", customerController.SearchCustomers)
+	authGroup.GET("/customers/:customerID", customerController.GetCustomer)
+	authGroup.PUT("/customers/:customerID", customerController.UpdateCustomer)
+	authGroup.DELETE("/customers/:customerID", customerController.DeleteCustomer)
 
 	// Orders
 	authGroup.POST("/orders", orderController.CreateOrder)

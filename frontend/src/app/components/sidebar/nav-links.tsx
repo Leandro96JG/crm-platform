@@ -10,6 +10,7 @@ import {
   HomeIcon,
   UserGroupIcon,
   UserCircleIcon,
+  IdentificationIcon,
 } from '@heroicons/react/24/outline';
 import clsx from 'clsx';
 import Link from 'next/link';
@@ -27,6 +28,12 @@ const links: {
   { name: 'Home', href: '/home', icon: HomeIcon, onlyAdmin: false },
   { name: 'Planchas', href: '/stickers', icon: GridIcon, onlyAdmin: false },
   { name: 'Pedidos', href: '/orders', icon: OrderBoxIcon, onlyAdmin: false },
+  {
+    name: 'Clientes',
+    href: '/customers',
+    icon: IdentificationIcon,
+    onlyAdmin: false,
+  },
   { name: 'Producción', href: '/printing', icon: GearIcon, onlyAdmin: false },
   { name: 'Usuarios', href: '/users', icon: UserGroupIcon, onlyAdmin: true },
   { name: 'Mi Perfil', href: '/profile', icon: UserCircleIcon, onlyAdmin: false },

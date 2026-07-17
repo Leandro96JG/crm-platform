@@ -105,6 +105,23 @@ Marca: **Viva**. Moneda: **peso argentino (ARS, locale es-AR)**.
 - **Fix:** tags JSON `json:"total"` etc. en `backend/internal/domain/paging.go`.
   Corrige orders, planchas y printing (users ya usaba su propio `PagingResponseDTO`).
 
+### Módulo de Clientes (P0)
+- **Backend completo (CRUD REST)**: migración `039_create_customers_table` (tabla `customers`
+  con name/phone/email/document/address/notes/is_active + timestamps, índices por
+  name/phone/is_active). `domain/customer.go`, `application/customer_service.go`,
+  `infra/repository/database/customer_repository.go` + `customer_dto.go`,
+  `rest/customer_controller.go` + `customer_dto.go`. Wiring en `runner.go`, rutas en
+  `routes_stickers.go`: `POST/GET /customers`, `GET/PUT/DELETE /customers/:customerID`.
+  Búsqueda por texto (`?search=` sobre name OR phone OR email). Probado end-to-end
+  (create/read/search/update/delete OK).
+- **Frontend**: tipo `Customer` + servicios `services/customers/` (search, fetch-one,
+  create, update, delete). Página `/customers` con `CustomersManager` (tabla + búsqueda +
+  modal de alta/edición + borrado con confirmación) y link "Clientes" en el sidebar.
+- **Integración con pedidos**: `OrderForm` recibe `customers` y el campo cliente usa
+  `<datalist>` (autocompletado). `customer_id` en `orders` SIGUE siendo texto libre (se
+  guarda el nombre elegido) — **FK `orders.customer_id → customers` queda pendiente**
+  (requiere migración de datos de los pedidos existentes).
+
 ### Repositorio Git
 - Subido a **https://github.com/Leandro96JG/crm-platform** (rama `main`).
 - `.gitignore` raíz (excluye `node_modules`, `.env`, builds Go/Next, logs).
@@ -131,9 +148,9 @@ Marca: **Viva**. Moneda: **peso argentino (ARS, locale es-AR)**.
   - [x] Botones en la cola según transiciones válidas (imprimir/cortar/fallido/etc.). ✅
   - [x] Servicio `updatePrintJobStatus` (`PUT /print-jobs/:id/status`) desde el frontend. ✅
 - [ ] **Módulo de Clientes** (gap de datos grande)
-  - [ ] Backend: tabla `customers`, dominio, repo, service, CRUD REST.
-  - [ ] FK `orders.customer_id → customers` (hoy es texto libre).
-  - [ ] Frontend: página de clientes + selección al crear pedido.
+  - [x] Backend: tabla `customers`, dominio, repo, service, CRUD REST. ✅
+  - [x] Frontend: página de clientes + selección al crear pedido (datalist). ✅
+  - [ ] FK `orders.customer_id → customers` (hoy sigue texto libre; requiere migrar datos).
 - [ ] **Arreglar enlace roto** `/users/[user_id]`: crear página de detalle/edición
   de usuario o quitar el botón "ver".
 
@@ -168,16 +185,18 @@ Marca: **Viva**. Moneda: **peso argentino (ARS, locale es-AR)**.
   `plancha_prices` (inconsistencia con `CalculatePrice`).
 - [ ] **Asignación de pedidos**: `assigned_to` existe en el modelo pero no hay
   endpoint ni UI para asignar operador.
-- [ ] Revisar componentes huérfanos restantes (`Modal` solo lo usa el modal de
-  primer login no montado).
+- [ ] Revisar componentes huérfanos restantes (`Modal` ahora también lo usa el módulo
+  de Clientes).
+- [ ] **FK `orders.customer_id → customers`**: migrar los pedidos existentes (customer_id
+  texto libre → id real) y refactorizar el alta de pedido a `customer_id`.
 
 ---
 
 ## 🎯 Próximo paso sugerido
-Crear pedido, ver detalle, cambiar estado de pedidos y avanzar producción desde la
-UI ya están hechos. Los siguientes pasos P0 de mayor valor:
-1. **Módulo de Clientes** (backend + FK `orders.customer_id` + UI) — hoy el cliente
-   es texto libre; es el mayor gap de datos.
-2. **Arreglar enlace roto** `/users/[user_id]` (detalle/edición o quitar el botón "ver").
+Pedidos (crear/detalle/estado), producción y Clientes (CRUD + UI) ya están hechos.
+Los siguientes pasos de mayor valor:
+1. **Arreglar enlace roto** `/users/[user_id]` (detalle/edición o quitar el botón "ver").
+2. **FK `orders.customer_id → customers`**: migrar datos de pedidos existentes y usar
+   `customer_id` real en el alta de pedidos (hoy se guarda el nombre como texto).
 3. **Timeline de estado** en el detalle de pedido (historial de transiciones; requiere
-   soporte de auditoría en el backend).
+   auditoría en el backend — tabla `order_status_history`).

@@ -39,6 +39,7 @@ func RunApp() error {
 	planchaRepository := database.NewPlanchaRepository(sqlDB)
 	materialRepository := database.NewStickerMaterialRepository(sqlDB)
 	planchaPriceRepository := database.NewPlanchaPriceRepository(sqlDB)
+	customerRepository := database.NewCustomerRepository(sqlDB)
 	orderRepository := database.NewOrderRepository(sqlDB)
 	printJobRepository := database.NewPrintJobRepository(sqlDB)
 	whatsappConversationRepository := database.NewWhatsAppConversationRepository(sqlDB)
@@ -53,6 +54,7 @@ func RunApp() error {
 
 	// sticker + whatsapp + ai services
 	planchaService := application.NewPlanchaService(planchaRepository, materialRepository, planchaPriceRepository)
+	customerService := application.NewCustomerService(customerRepository)
 	orderService := application.NewOrderService(orderRepository, planchaRepository, planchaPriceRepository, printJobRepository, orderItemRepository)
 	printingService := application.NewPrintingService(printJobRepository, orderRepository, orderService)
 	openaiClient := ai.NewClient(appConfig.OpenAI.APIKeyValue(), appConfig.OpenAI.Model)
@@ -67,6 +69,7 @@ func RunApp() error {
 
 	// sticker controllers
 	planchaController := rest.NewPlanchaController(planchaService)
+	customerController := rest.NewCustomerController(customerService)
 	orderController := rest.NewOrderController(orderService)
 	printingController := rest.NewPrintingController(printingService)
 	whatsappController := rest.NewWhatsAppController(whatsappService, appConfig.WhatsApp.WebhookSecretValue())
@@ -98,6 +101,7 @@ func RunApp() error {
 		orderController,
 		printingController,
 		whatsappController,
+		customerController,
 	)
 
 	return router.Run()

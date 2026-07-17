@@ -6,6 +6,7 @@ import { useSnackbar } from '@/app/context/SnackbarProvider';
 import { createOrder } from '@/app/services/orders';
 import { calculatePrice } from '@/app/services/planchas';
 import { Plancha, StickerMaterial } from '@/app/types/plancha';
+import { Customer } from '@/app/types/customer';
 import { formatCurrency } from '@/app/utils/status';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -14,6 +15,7 @@ import { signOut } from 'next-auth/react';
 interface OrderFormProps {
   planchas: Plancha[];
   materials: StickerMaterial[];
+  customers: Customer[];
 }
 
 interface ItemRow {
@@ -38,7 +40,11 @@ const inputClass =
   'w-full rounded-md border border-line bg-card px-3 py-2 text-[13px] text-ink outline-none transition-colors focus:border-cut-dark';
 const labelClass = 'mb-1 block text-[12px] font-medium text-ink-soft';
 
-export default function OrderForm({ planchas, materials }: OrderFormProps) {
+export default function OrderForm({
+  planchas,
+  materials,
+  customers,
+}: OrderFormProps) {
   const router = useRouter();
   const { showSnackbar } = useSnackbar();
 
@@ -163,10 +169,18 @@ export default function OrderForm({ planchas, materials }: OrderFormProps) {
             <label className={labelClass}>Cliente *</label>
             <input
               className={inputClass}
+              list="customers-list"
               value={customerId}
               onChange={(e) => setCustomerId(e.target.value)}
-              placeholder="Nombre o teléfono del cliente"
+              placeholder="Elegí un cliente o escribí uno nuevo"
             />
+            <datalist id="customers-list">
+              {customers.map((c) => (
+                <option key={c.customer_id} value={c.name}>
+                  {c.phone ? `${c.name} — ${c.phone}` : c.name}
+                </option>
+              ))}
+            </datalist>
           </div>
           <div>
             <label className={labelClass}>Urgencia</label>
