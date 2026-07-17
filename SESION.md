@@ -56,6 +56,44 @@ Marca: **Viva**. Moneda: **peso argentino (ARS, locale es-AR)**.
 ### Moneda
 - `ARS` / `es-AR` en `utils/status.ts`. Eliminada toda referencia a Brasil/BRL.
 
+### Mutaciones de estado en la UI (P0 parcial)
+- **Cambiar estado de pedido**: servicio `updateOrderStatus` (`services/orders/update-status.ts`,
+  `PUT /orders/:id/status`) + dropdown de acciones en `components/orders/status-actions.tsx`
+  (columna "Acciones" en la tabla de pedidos). Solo ofrece transiciones válidas.
+- **Avanzar producción**: servicio `updatePrintJobStatus` (`services/printing/update-status.ts`,
+  `PUT /print-jobs/:id/status`) + botones en `components/printing/job-actions.tsx`
+  (integrados en `queue.tsx`). Transiciones según `isValidTransition` del backend.
+- Mapas de transiciones en `utils/status.ts`: `getNextOrderStatuses`,
+  `getNextPrintJobStatuses` (reflejan las reglas del backend).
+
+### Skeletons de carga + microinteracciones (solo Tailwind)
+- Keyframe `fadeIn` (opacity + translateY) en `tailwind.config.ts` → clase `animate-fadeIn`.
+- Skeletons con `animate-pulse`: `kpi-card/skeleton.tsx`, y en `components/common/skeletons/`
+  (`orders-table-skeleton`, `production-queue-skeleton`, `table-skeleton` genérico,
+  `page-header-skeleton`).
+- Home usa `<Suspense>` por sección (streaming con fetch real): componentes async
+  `components/home/` (`kpi-section`, `recent-orders`, `production-queue`).
+- `loading.tsx` por ruta en orders / printing / stickers / users (App Router los
+  muestra durante la navegación). Se quitaron los `<Suspense>` con "Cargando..." inútiles.
+- Fade-in escalonado por fila/tarjeta (`animationDelay: i*40ms`) en todas las tablas
+  y colas. Pulso sutil en badge para estados `in_production` / `printing` / `cutting`
+  (`StatusBadge` acepta prop `pulse`).
+
+### Bug fix: paginación devolvía 0 en KPIs
+- **Causa raíz:** `domain.Paging` (Go) no tenía tags JSON → serializaba `Total`/`Limit`/`Offset`
+  (mayúscula) pero el tipo TS `SearchResponse.paging` espera minúscula → `paging.total`
+  quedaba `undefined` → KPIs mostraban 0.
+- **Fix:** tags JSON `json:"total"` etc. en `backend/internal/domain/paging.go`.
+  Corrige orders, planchas y printing (users ya usaba su propio `PagingResponseDTO`).
+
+### Repositorio Git
+- Subido a **https://github.com/Leandro96JG/crm-platform** (rama `main`).
+- `.gitignore` raíz (excluye `node_modules`, `.env`, builds Go/Next, logs).
+- Plantillas `backend/.env.example` y `frontend/.env.example` (sin secretos).
+- `README.md` raíz con setup Docker, credenciales, scripts y flujo multi-PC.
+- **Los `.env` reales NO están versionados** — recrear desde `.env.example` en cada PC.
+  Para Docker no hacen falta (el `docker-compose.yml` trae las env vars inline).
+
 ---
 
 ## 🚧 Pendiente / Próximas funcionalidades
@@ -67,12 +105,12 @@ Marca: **Viva**. Moneda: **peso argentino (ARS, locale es-AR)**.
 ### P0 — Crítico (hace el CRM realmente usable)
 - [ ] **Mutaciones de pedidos en la UI**
   - [ ] Crear pedido (formulario: cliente, items con plancha+material+cantidad).
-  - [ ] Cambiar estado del pedido (dropdown/acciones: pending→approved→…→delivered).
+  - [x] Cambiar estado del pedido (dropdown de acciones con transiciones válidas). ✅
   - [ ] Página de detalle `/orders/[order_id]` con items y timeline de estado.
-  - [ ] Servicios frontend de mutación (POST/PUT) en `services/orders`.
-- [ ] **Avanzar producción desde la UI**
-  - [ ] Botones en la cola: imprimir→impreso, cortar→cortado, marcar fallido.
-  - [ ] Servicio `PUT /print-jobs/:id/status` desde el frontend.
+  - [x] Servicio frontend de mutación `updateOrderStatus` (`PUT /orders/:id/status`). ✅
+- [x] **Avanzar producción desde la UI** ✅
+  - [x] Botones en la cola según transiciones válidas (imprimir/cortar/fallido/etc.). ✅
+  - [x] Servicio `updatePrintJobStatus` (`PUT /print-jobs/:id/status`) desde el frontend. ✅
 - [ ] **Módulo de Clientes** (gap de datos grande)
   - [ ] Backend: tabla `customers`, dominio, repo, service, CRUD REST.
   - [ ] FK `orders.customer_id → customers` (hoy es texto libre).
@@ -117,6 +155,10 @@ Marca: **Viva**. Moneda: **peso argentino (ARS, locale es-AR)**.
 ---
 
 ## 🎯 Próximo paso sugerido
-Empezar por **P0 — cambiar estado de pedidos y avanzar producción desde la UI**:
-es el flujo diario del taller, ya existe el backend (`PUT /orders/:id/status` y
-`PUT /print-jobs/:id/status`), solo falta cablear servicios de mutación + botones.
+El cambio de estado de pedidos y el avance de producción desde la UI ya están
+hechos. Los siguientes pasos P0 de mayor valor:
+1. **Crear pedido desde la UI** (formulario con cliente + items) — cierra el ciclo
+   completo del flujo diario.
+2. **Página de detalle `/orders/[order_id]`** con items y timeline de estado.
+3. **Módulo de Clientes** (backend + FK `orders.customer_id` + UI) — hoy el cliente
+   es texto libre; es el mayor gap de datos.
