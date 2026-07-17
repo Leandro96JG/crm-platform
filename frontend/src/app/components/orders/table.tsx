@@ -3,6 +3,7 @@ import OrderStatusActions from '@/app/components/orders/status-actions';
 import { PencilIcon, WhatsAppIcon } from '@/app/components/common/icons';
 import { Order } from '@/app/types/order';
 import { formatCurrency, getOrderStatusMeta } from '@/app/utils/status';
+import Link from 'next/link';
 
 interface OrdersTableProps {
   orders: Order[];
@@ -71,8 +72,13 @@ export default function OrdersTable({ orders, paging }: OrdersTableProps) {
                   style={{ animationDelay: `${i * 40}ms` }}
                   className="animate-fadeIn border-b border-line transition-colors duration-150 last:border-none hover:bg-paper-dim/40"
                 >
-                  <td className="px-5 py-3.5 font-mono text-[12.5px] text-ink-soft">
-                    {order.order_number}
+                  <td className="px-5 py-3.5 font-mono text-[12.5px]">
+                    <Link
+                      href={`/orders/${order.order_id}`}
+                      className="text-cut-dark transition-colors hover:underline"
+                    >
+                      {order.order_number}
+                    </Link>
                   </td>
                   <td className="px-5 py-3.5 text-[13px] font-semibold text-ink">
                     {order.customer_id || '—'}

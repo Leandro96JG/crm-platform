@@ -79,3 +79,18 @@ const currencyFormatter = new Intl.NumberFormat('es-AR', {
 export function formatCurrency(value: number): string {
   return currencyFormatter.format(value ?? 0);
 }
+
+const dateTimeFormatter = new Intl.DateTimeFormat('es-AR', {
+  day: '2-digit',
+  month: '2-digit',
+  year: 'numeric',
+  hour: '2-digit',
+  minute: '2-digit',
+});
+
+export function formatDateTime(value: string | null | undefined): string {
+  if (!value) return '-';
+  const date = new Date(value);
+  if (isNaN(date.getTime())) return '-';
+  return dateTimeFormatter.format(date);
+}

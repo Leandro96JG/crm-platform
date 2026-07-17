@@ -66,6 +66,15 @@ Marca: **Viva**. Moneda: **peso argentino (ARS, locale es-AR)**.
   notas, ítems dinámicos (plancha/material/cantidad) con **cálculo de precio en vivo** por
   ítem y total en ARS; snackbar de éxito y redirect a `/orders`.
 
+### Página de detalle de pedido (P0)
+- **`/orders/[order_id]`**: servicio `fetchOrder` (`services/orders/fetch-one.ts`,
+  `GET /orders/:orderID`). El N° de pedido en la tabla enlaza al detalle.
+- Muestra ítems (plancha/material resueltos a nombre vía `fetchPlanchas`+`fetchMaterials`,
+  cantidad, precio unit., subtotal), total, panel de info (estado, cliente, origen,
+  urgencia, asignado), fechas (creado/actualizado/completado) y notas.
+- Cambio de estado en línea reusando `OrderStatusActions`.
+- Helper `formatDateTime` (locale es-AR) en `utils/status.ts`.
+
 ### Mutaciones de estado en la UI (P0 parcial)
 - **Cambiar estado de pedido**: servicio `updateOrderStatus` (`services/orders/update-status.ts`,
   `PUT /orders/:id/status`) + dropdown de acciones en `components/orders/status-actions.tsx`
@@ -116,7 +125,7 @@ Marca: **Viva**. Moneda: **peso argentino (ARS, locale es-AR)**.
 - [ ] **Mutaciones de pedidos en la UI**
   - [x] Crear pedido (formulario: cliente, items con plancha+material+cantidad). ✅
   - [x] Cambiar estado del pedido (dropdown de acciones con transiciones válidas). ✅
-  - [ ] Página de detalle `/orders/[order_id]` con items y timeline de estado.
+  - [x] Página de detalle `/orders/[order_id]` con items (timeline de estado pendiente). ✅
   - [x] Servicio frontend de mutación `updateOrderStatus` (`PUT /orders/:id/status`). ✅
 - [x] **Avanzar producción desde la UI** ✅
   - [x] Botones en la cola según transiciones válidas (imprimir/cortar/fallido/etc.). ✅
@@ -165,9 +174,10 @@ Marca: **Viva**. Moneda: **peso argentino (ARS, locale es-AR)**.
 ---
 
 ## 🎯 Próximo paso sugerido
-Crear pedido, cambiar estado de pedidos y avanzar producción desde la UI ya están
-hechos. Los siguientes pasos P0 de mayor valor:
-1. **Página de detalle `/orders/[order_id]`** con items y timeline de estado.
-2. **Módulo de Clientes** (backend + FK `orders.customer_id` + UI) — hoy el cliente
+Crear pedido, ver detalle, cambiar estado de pedidos y avanzar producción desde la
+UI ya están hechos. Los siguientes pasos P0 de mayor valor:
+1. **Módulo de Clientes** (backend + FK `orders.customer_id` + UI) — hoy el cliente
    es texto libre; es el mayor gap de datos.
-3. **Arreglar enlace roto** `/users/[user_id]` (detalle/edición o quitar el botón "ver").
+2. **Arreglar enlace roto** `/users/[user_id]` (detalle/edición o quitar el botón "ver").
+3. **Timeline de estado** en el detalle de pedido (historial de transiciones; requiere
+   soporte de auditoría en el backend).
